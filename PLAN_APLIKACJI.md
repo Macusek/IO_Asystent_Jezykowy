@@ -1,6 +1,6 @@
 # Plan aplikacji do nauki języków z AI
 
-Źródłem wymagań jest dokumentacja inżynierii wymagań (LanguageMate Sp. z o.o., zamawiający: Paweł Lewandowski). Zespół: Łukasz Skrzypek, Maciej Antosz, Arek Kępa.
+Źródłem wymagań jest dokumentacja inżynierii wymagań (LanguageMate Sp. z o.o., zamawiający: Paweł Lewandowski). 
 
 Aplikacja prowadzi z użytkownikiem pisemną rozmowę w języku obcym, dostosowaną do wybranego poziomu, poprawia błędy i zapisuje postępy na koncie.
 
@@ -198,13 +198,6 @@ Moduły:
 - `llm` — odczyt `groq_api_key.txt`, prompt, wywołanie Groq (`openai/gpt-oss-120b`), parsowanie błędów, timeout i retry.
 - `stats` — formuły z dokumentu i reset.
 - `web` — pięć ekranów plus rejestracja i reset hasła.
-
-Podział względem macierzy kompetencji:
-
-- Integracja LLM (Groq): Łukasz Skrzypek.
-- Schemat bazy, auth i statystyki: Maciej Antosz i Arek Kępa.
-- Przypadki użycia i zgodność z diagramami UML: Arek Kępa.
-- Testy językowe angielskiego i hiszpańskiego: cały zespół.
 
 ## Etapy
 
