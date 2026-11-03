@@ -1,0 +1,58 @@
+// Opcjonalny test UI: wymaga playwright i uruchomionego browser_server.py.
+const {chromium}=require('playwright');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+(async()=>{
+ const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHANNEL?{channel:process.env.PLAYWRIGHT_CHANNEL}:{})});
+ try{
+  const page=await browser.newPage({viewport:{width:1440,height:1050}});
+  const failures=[];page.on('pageerror',e=>failures.push(e.message));
+  fs.mkdirSync('tmp/ui',{recursive:true});
+  await page.goto('http://127.0.0.1:8011');
+  await page.getByRole('heading',{name:'Witaj ponownie'}).waitFor();
+  await page.screenshot({path:'tmp/ui/login.png',fullPage:true});
+  await page.getByRole('link',{name:'Utwórz konto',exact:true}).click();
+  const email=`browser-${Date.now()}@example.com`;
+  await page.getByLabel('E-mail',{exact:true}).fill(email);
+  await page.getByLabel('Hasło',{exact:true}).fill('bezpieczne-haslo123');
+  await page.getByRole('button',{name:'Zarejestruj się',exact:true}).click();
+  await page.getByRole('heading',{name:'Witaj ponownie'}).waitFor();
+  await page.getByLabel('E-mail',{exact:true}).fill(email);
+  await page.getByLabel('Hasło',{exact:true}).fill('bezpieczne-haslo123');
+  await page.getByRole('button',{name:'Zaloguj się',exact:true}).click();
+  await page.getByLabel('Język',{exact:true}).selectOption('ES');
+  await page.getByLabel('Poziom CEFR',{exact:true}).selectOption('A2');
+  await page.screenshot({path:'tmp/ui/setup.png',fullPage:true});
+  await page.getByRole('button',{name:'Rozpocznij',exact:true}).click();
+  await page.getByRole('heading',{name:'Korekty na bieżąco'}).waitFor();
+  assert.equal(await page.locator('.intro').isVisible(),false);
+  const chatBounds=await page.locator('#screen').boundingBox();
+  const correctionsBounds=await page.locator('#live-corrections').boundingBox();
+  assert.ok(chatBounds.width>700);
+  assert.ok(correctionsBounds.x>=chatBounds.x+chatBounds.width);
+  await page.getByLabel('Napisz wiadomość…').fill('Yo tiene veinte años.');
+  await page.getByRole('button',{name:'Wyślij',exact:true}).click();
+  await page.locator('.bubble.ai').filter({hasText:'¡Hola! ¿Qué te gusta hacer en tu tiempo libre?'}).waitFor();
+  await page.locator('#live-corrections').getByText('→ Yo tengo veinte años.',{exact:true}).waitFor();
+  await page.screenshot({path:'tmp/ui/chat.png',fullPage:true});
+  await page.getByLabel('Napisz wiadomość…').fill('AWARIA');
+  await page.getByRole('button',{name:'Wyślij',exact:true}).click();
+  await page.getByText('Wiadomość nieoceniona.',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Zakończ rozmowę',exact:true}).click();
+  await page.getByRole('heading',{name:'Błędy w rozmowie'}).waitFor();
+  assert.equal(await page.locator('.intro').isVisible(),true);
+  assert.equal(await page.locator('#live-corrections').count(),0);
+  await page.getByText('→ Yo tengo veinte años.',{exact:true}).waitFor();
+  await page.screenshot({path:'tmp/ui/summary.png',fullPage:true});
+  await page.getByRole('button',{name:'Statystyki',exact:true}).click();
+  await page.getByRole('heading',{name:'Twoje statystyki'}).waitFor();
+  await page.screenshot({path:'tmp/ui/stats.png',fullPage:true});
+  page.once('dialog',dialog=>dialog.accept());
+  await page.getByRole('button',{name:'Resetuj statystyki',exact:true}).click();
+  await page.getByText('Brak ocenionych zdań — procent błędów nie jest jeszcze miarodajny.',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Wyloguj',exact:true}).click();
+  await page.getByRole('heading',{name:'Witaj ponownie'}).waitFor();
+  assert.deepEqual(failures,[]);
+  console.log('UI PASS: rejestracja, logowanie, ustawienia, czat, awaria, zakończenie, korekty, statystyki, reset, wylogowanie; brak błędów JS. Tylko stub.');
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

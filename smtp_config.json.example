@@ -1,0 +1,7 @@
+{
+  "host": "smtp.example.com",
+  "port": 587,
+  "sender": "noreply@example.com",
+  "username": "noreply@example.com",
+  "password": "UZUPELNIJ_LOKALNIE"
+}

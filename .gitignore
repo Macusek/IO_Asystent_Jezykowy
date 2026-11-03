@@ -1,0 +1,11 @@
+groq_api_key.txt
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+data/
+tmp/
+.env
+*.log
+smtp_config.json
+node_modules/
