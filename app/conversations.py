@@ -60,6 +60,15 @@ def active(request: Request):
     with connect(request.app.state.db_path) as db:
         return [dict(r) for r in db.execute('SELECT * FROM conversations WHERE user_id=? AND end_ts IS NULL ORDER BY id DESC',(user['id'],))]
 
+@router.get('/history')
+def history(request: Request):
+    user=current_user(request)
+    with connect(request.app.state.db_path) as db:
+        return [dict(r) for r in db.execute(
+            "SELECT c.*,(SELECT COUNT(*) FROM messages m WHERE m.conversation_id=c.id AND m.author='user') AS user_messages,"
+            "(SELECT COUNT(*) FROM errors e JOIN messages m ON m.id=e.message_id WHERE m.conversation_id=c.id) AS error_count "
+            'FROM conversations c WHERE c.user_id=? AND c.end_ts IS NOT NULL ORDER BY c.end_ts DESC,c.id DESC',(user['id'],))]
+
 @router.get('/{cid}')
 def detail(cid: int,request: Request):
     user=current_user(request)
@@ -79,6 +88,18 @@ def finish(cid: int,request: Request):
                 db.execute('UPDATE conversations SET end_ts=? WHERE id=?',(max(time.time(),conversation['start_ts']),cid))
     return summary(cid,request)
 
+@router.post('/{cid}/resume')
+def resume(cid: int,request: Request):
+    user=current_user(request)
+    with conversation_lock(cid):
+        with connect(request.app.state.db_path) as db:
+            conversation=owned(db,cid,user['id'])
+            if conversation['end_ts'] is not None:
+                # Przerwa między zakończeniem a wznowieniem nie może wliczać się do czasu rozmowy (słowa na minutę).
+                start=time.time()-(conversation['end_ts']-conversation['start_ts'])
+                db.execute('UPDATE conversations SET start_ts=?,end_ts=NULL WHERE id=?',(start,cid))
+    return {'id':cid}
+
 @router.get('/{cid}/summary')
 def summary(cid: int,request: Request):
     user=current_user(request)
@@ -90,7 +111,8 @@ def summary(cid: int,request: Request):
         unassessed=db.execute("SELECT COUNT(*) FROM messages WHERE conversation_id=? AND author='user' AND status!='evaluated'",(cid,)).fetchone()[0]
         from .stats import conversation_stats
         stats=conversation_stats(db,cid)
-    return {'conversation':conversation,'errors':errors,'unassessed_messages':unassessed,'stats':stats}
+        messages=[dict(r) for r in db.execute('SELECT * FROM messages WHERE conversation_id=? ORDER BY id',(cid,))]
+    return {'conversation':conversation,'messages':messages,'errors':errors,'unassessed_messages':unassessed,'stats':stats}
 
 @router.post('/{cid}/messages')
 def send(cid: int,body: MessageInput,request: Request):

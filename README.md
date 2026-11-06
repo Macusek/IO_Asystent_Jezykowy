@@ -63,7 +63,7 @@ macOS / Linux:
 .venv/bin/python -m app.main
 ```
 
-Otwórz [http://127.0.0.1:8000](http://127.0.0.1:8000). Zarejestruj konto (e-mail i hasło 10–128 znaków), zaloguj się, wybierz język i poziom, naciśnij „Rozpocznij”. Napisz pierwszą wiadomość — każda wysłana tura wywołuje Groq z historią rozmowy. „Zakończ rozmowę” otwiera korekty i podsumowanie. „Statystyki” pokazują wyniki konta dla wybranego języka. Przerwaną aktywną rozmowę można wznowić po ponownym zalogowaniu lub odświeżeniu strony. Zatrzymanie serwera: Ctrl+C.
+Otwórz [http://127.0.0.1:8000](http://127.0.0.1:8000). Zarejestruj konto (e-mail i hasło 10–128 znaków), zaloguj się, wybierz język i poziom, naciśnij „Rozpocznij”. Napisz pierwszą wiadomość — każda wysłana tura wywołuje Groq z historią rozmowy. „Zakończ rozmowę” otwiera korekty i podsumowanie. „Statystyki” pokazują wyniki konta dla wybranego języka. Przerwaną aktywną rozmowę można wznowić po ponownym zalogowaniu lub odświeżeniu strony. „Historia rozmów” pokazuje zakończone rozmowy: można przeczytać ich przebieg i korekty albo kontynuować je przyciskiem „Kontynuuj rozmowę”. Zatrzymanie serwera: Ctrl+C.
 
 Serwer nasłuchuje lokalnie, w jednym procesie. Blokady serializują operacje tury i zakończenia w obrębie rozmowy. Nie uruchamiaj wielu workerów bez dodania blokad między procesami. Do pracy przez HTTPS ustaw `--secure-cookie` i właściwy `--public-url`; domyślna konfiguracja jest przeznaczona na własny komputer.
 

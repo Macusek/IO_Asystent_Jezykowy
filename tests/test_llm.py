@@ -29,7 +29,7 @@ def test_groq_request():
         data=json.loads(request.content)
         assert data['model']==MODEL
         assert data['messages'][-1]=={'role':'user','content':'Hola.'}
-        assert 'A2' in data['messages'][0]['content'] and 'ES' in data['messages'][0]['content']
+        assert 'A2' in data['messages'][0]['content'] and 'Spanish' in data['messages'][0]['content']
         return httpx.Response(200,json={'choices':[{'finish_reason':'stop','message':{'content':json.dumps({'reply':'¡Hola!','errors':[]})}}]})
     c=GroqClient('dummy-test-value',transport=httpx.MockTransport(handler))
     assert c.complete([{'role':'user','content':'Hola.'}],'ES','A2','Hola.').reply=='¡Hola!'

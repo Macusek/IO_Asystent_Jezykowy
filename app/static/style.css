@@ -14,5 +14,12 @@
 .corrections-panel h2{font-size:22px}
 .corrections-panel .errors{margin-bottom:0}
 .corrections-empty{padding:20px;background:#f0f5ef;border:1px dashed #cbd8cf;border-radius:12px;color:#637a70}
+.history{list-style:none;padding:0;margin:20px 0 0}
+.history li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #e7ede6}
+.history li b,.history li small{display:block}
+.history li button{padding:8px 16px}
+.transcript{margin-top:24px;border:1px solid #e0e8e0;border-radius:12px;padding:12px 16px}
+.transcript summary{cursor:pointer;font-weight:600}
+.transcript .chat{max-height:420px;margin:12px 0 0}
 .conversation-view footer{max-width:1432px;margin-top:32px}
 @media(max-width:900px){.conversation-view main{grid-template-columns:minmax(0,1fr);gap:20px}.corrections-panel{grid-column:1;grid-row:2;position:static;max-height:440px}.conversation-view .chat{height:45vh;min-height:260px}.conversation-view #notice{grid-row:3}}
